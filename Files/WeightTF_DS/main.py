@@ -4,6 +4,7 @@ from graphic_hist import plot_training_history
 from export_model import export_model
 import numpy as np
 from keras.callbacks import EarlyStopping
+from sklearn.metrics import classification_report, balanced_accuracy_score
 
 from preparation_ds import extract_features, time_train_test_split
 
@@ -126,6 +127,19 @@ def main() -> None:
         probabilities = model.predict(X_test, verbose=0)   # shape (N, 3)
         class_indices = np.argmax(probabilities, axis=1)   # 0=Sell, 1=NoTrade, 2=Buy
         signals = class_indices - 1                        # обратно в -1 / 0 / +1
+
+        print()
+        print("Balanced accuracy:")
+        print(balanced_accuracy_score(y_test, class_indices))
+
+        print()
+        print("Classification report:")
+        print(classification_report(
+            y_test,
+            class_indices,
+            target_names=["Sell (-1)", "NoTrade (0)", "Buy (+1)"],
+            digits=4,
+        ))
 
         print()
         print("Первые 10 вероятностей [Sell, NoTrade, Buy]:")
