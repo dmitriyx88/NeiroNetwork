@@ -1,5 +1,6 @@
 from keras import layers, models, optimizers, regularizers
-from keras.metrics import AUC
+
+
 
 import numpy as np
 
@@ -33,14 +34,15 @@ def build_multiclassification_model(input_size: int, X_train: np.ndarray) -> mod
     """
     normalizer = normalization_layer_multiclass(X_train)
 
+
     model = models.Sequential([
         layers.Input(shape=(input_size,)),
         normalizer,
-        layers.Dense(128, activation="relu", kernel_regularizer=regularizers.l2(0.0005)),
+        layers.Dense(256, activation="relu", kernel_regularizer=regularizers.l2(0.0005)),
         layers.Dropout(0.20),
-        layers.Dense(64, activation="relu", kernel_regularizer=regularizers.l2(0.0005)),
+        layers.Dense(128, activation="relu", kernel_regularizer=regularizers.l2(0.0005)),
         layers.Dropout(0.15),
-        layers.Dense(32, activation="relu", kernel_regularizer=regularizers.l2(0.0005)),
+        layers.Dense(64, activation="relu", kernel_regularizer=regularizers.l2(0.0005)),
         layers.Dropout(0.10),
         layers.Dense(3, activation="softmax"),
     ])

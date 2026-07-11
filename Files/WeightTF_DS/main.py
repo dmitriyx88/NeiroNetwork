@@ -3,6 +3,7 @@ from import_ds import get_default_dataset_path, load_dataset
 from graphic_hist import plot_training_history
 from export_model import export_model
 import numpy as np
+from keras.callbacks import EarlyStopping
 
 from preparation_ds import extract_features, time_train_test_split
 
@@ -73,18 +74,27 @@ def main() -> None:
     else:
         model = build_regression_model(input_size=X_train.shape[1], X_train=X_train)
 
+    early_stop = EarlyStopping(monitor="val_loss", patience=5, restore_best_weights=True)
+
     model.summary()
 
     # shuffle=False сохраняет порядок временного ряда внутри эпохи.
     # validation_split берет последний кусок train-выборки под validation.
-    history = model.fit(
-        X_train,
-        y_train,
+    fit_params = dict(
         validation_split=0.20,
         epochs=EPOCHS,
         batch_size=BATCH_SIZE,
         shuffle=False,
         verbose=1,
+        callbacks=[early_stop],
+    )
+    #if TASK == "multiclass":
+    #    fit_params["class_weight"] = {0: 1.2, 1: 1.0, 2: 1.2}
+    
+    history = model.fit(
+        X_train,
+        y_train,
+        **fit_params
     )
 
     test_result = model.evaluate(X_test, y_test, verbose=0)
