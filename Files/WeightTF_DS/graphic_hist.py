@@ -58,16 +58,13 @@ def plot_training_history(history) -> None:
         plt.legend()
         finish_plot("auc.png")
 
+    # График MAE: для регрессии показывает среднюю абсолютную ошибку.
+    if "mae" in history_dict and "val_mae" in history_dict:
+        plt.plot(epochs, history_dict["mae"], "bo", label="MAE на обучении")
+        plt.plot(epochs, history_dict["val_mae"], "b", label="MAE на валидации")
+        plt.title("MAE на обучении и валидации")
+        plt.xlabel("Эпохи")
+        plt.ylabel("MAE")
+        plt.legend()
+        finish_plot("mae.png")
 
-def plot_probability_distribution(probabilities) -> None:
-    """Строит гистограмму вероятностей класса Target1 == 1."""
-
-    plt.hist(probabilities, bins=50, edgecolor="black")
-    plt.axvline(0.50, color="black", linestyle="--", label="Порог 0.50")
-    plt.axvline(0.60, color="green", linestyle="--", label="Buy > 0.60")
-    plt.axvline(0.40, color="red", linestyle="--", label="Sell < 0.40")
-    plt.title("Распределение вероятностей Target1 == 1")
-    plt.xlabel("Вероятность")
-    plt.ylabel("Количество прогнозов")
-    plt.legend()
-    finish_plot("probabilities.png")

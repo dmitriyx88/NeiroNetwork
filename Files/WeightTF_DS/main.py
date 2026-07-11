@@ -1,10 +1,22 @@
 from config import BATCH_SIZE, EPOCHS, TASK, TRAIN_PART
 from import_ds import get_default_dataset_path, load_dataset
-from preparation_ds import split_features_and_target, time_train_test_split
-from model_NN import build_regression_model, build_classification_model, build_multiclassification_model
-from graphic_hist import plot_probability_distribution, plot_training_history
+from graphic_hist import plot_training_history
+from export_model import export_model
 import numpy as np
 
+from preparation_ds import extract_features, time_train_test_split
+
+from model_class.model_cl import build_classification_model
+from model_class.prepare_ds_cl import get_target_cl
+from model_class.plot_results_cl import plot_roc_curve, plot_confusion_matrix_cl, plot_probability_distribution_cl
+
+from model_multiclass.model_mcl import build_multiclassification_model
+from model_multiclass.prepare_ds_mcl import get_target_mcl
+from model_multiclass.plot_results_mcl import plot_confusion_matrix_mcl, plot_class_distribution, plot_softmax_confidence
+
+from model_regress.model_reg import build_regression_model
+from model_regress.prepare_ds_reg import get_target_reg
+from model_regress.plot_results_reg import plot_scatter, plot_residuals
 
 def main() -> None:
     """
@@ -31,7 +43,14 @@ def main() -> None:
     print(f"Период: {df['Time'].min()} -> {df['Time'].max()}")
     print()
 
-    X, y, feature_cols = split_features_and_target(df, TASK)
+    #X, y, feature_cols = split_features_and_target(df, TASK)
+    X, feature_cols = extract_features(df)
+    if TASK == "classification":
+        y = get_target_cl(df)
+    elif TASK == "multiclass":
+        y = get_target_mcl(df)
+    else:
+        y = get_target_reg(df)
 
     print(f"Количество признаков: {len(feature_cols)}")
     print("Признаки:")
@@ -87,7 +106,10 @@ def main() -> None:
         print("Первые 10 сигналов по порогу 0.5:")
         print(signals[:10])
 
-        plot_probability_distribution(probabilities)
+        # Графики для бинарной классификации.
+        plot_probability_distribution_cl(probabilities)
+        plot_roc_curve(y_test, probabilities)
+        plot_confusion_matrix_cl(y_test, signals)
     
     elif TASK == "multiclass":
         # Для 3-классовой классификации predict возвращает вероятности [Sell, NoTrade, Buy].
@@ -102,6 +124,11 @@ def main() -> None:
         print("Первые 10 торговых сигналов (-1=Sell, 0=NoTrade, +1=Buy):")
         print(signals[:10])
 
+        # Графики для 3-классовой классификации.
+        plot_confusion_matrix_mcl(y_test, class_indices)
+        plot_class_distribution(y_test, class_indices)
+        plot_softmax_confidence(probabilities)
+
     else:
         # Для регрессии predict возвращает ожидаемое Target2.
         predictions = model.predict(X_test, verbose=0).ravel()
@@ -110,9 +137,14 @@ def main() -> None:
         print("Первые 10 прогнозов Target2:")
         print(predictions[:10])
 
+        # Графики для регрессии.
+        plot_scatter(y_test, predictions)
+        plot_residuals(y_test, predictions)
+
     # history.history можно использовать для графика loss/accuracy/auc.
     return history
 
+#export_model(save_keras=True, save_ONNX=True, model_name="model")
 
 if __name__ == "__main__":
     
