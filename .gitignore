@@ -1,7 +1,7 @@
 /.agents
 /.codex
 /.venv
-/__pycache__
+__pycache__/
 
 # Large dataset files
 Files/WeightTF_DS/DS_IN/
