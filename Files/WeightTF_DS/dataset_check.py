@@ -14,7 +14,7 @@ print("=" * 70)
 
 # 1. СТРУКТУРА ФАЙЛА
 print("\n1️⃣  СТРУКТУРА ФАЙЛА:")
-path = Path('DS_EURUSD/DS_IN/dataset_EURUSD_H1.csv')
+path = Path('Files/WeightTF_DS/DS_IN/dataset_EURUSD_M5.csv')
 df = pd.read_csv(path, sep='\t')
 print(f"   ✓ Размер: {df.shape[0]} строк × {df.shape[1]} колонок")
 print(f"   ✓ Ожидалось: ~52,035 строк × 25 колонок")
