@@ -54,39 +54,40 @@ def build_classification_model(input_size: int, X_train: np.ndarray) -> models.M
 
 def build_multiclassification_model(input_size: int, X_train: np.ndarray) -> models.Model:
     """
-    Создает простую модель для многоклассовой классификации Target1.
+    Создает модель для 3-классовой классификации Target1/Target2.
+
+    Классы (после prepare_multiclass_target):
+        0 -> Sell   (исходный -1)
+        1 -> NoTrade (исходный  0)
+        2 -> Buy    (исходный +1)
 
     Последний слой:
         Dense(3, activation="softmax")
 
-    Softmax возвращает вероятность каждого класса в диапазоне 0..1.
+    Softmax возвращает вероятности трёх классов, сумма = 1.
+    Таргет должен быть int32: 0 / 1 / 2.
+
+    Примечание: AUC не используется — keras.metrics.AUC рассчитан на бинарный вывод
+    и даёт некорректный результат при softmax с 3 выходами.
     """
     normalizer = create_normalization_layer(X_train)
 
     model = models.Sequential([
         layers.Input(shape=(input_size,)),
         normalizer,
-
-        # Первый плотный слой ищет нелинейные комбинации индикаторов.
-        layers.Dense(48, activation="relu"),
-
-        # Dropout случайно выключает часть нейронов во время обучения.
-        # Это помогает снизить переобучение.
+        layers.Dense(128, activation="relu", kernel_regularizer=regularizers.l2(0.0005)),
         layers.Dropout(0.20),
-
-        layers.Dense(24, activation="relu"),
-
-        # Один выход: вероятность Target1 == 1.
+        layers.Dense(64, activation="relu", kernel_regularizer=regularizers.l2(0.0005)),
+        layers.Dropout(0.15),
+        layers.Dense(32, activation="relu", kernel_regularizer=regularizers.l2(0.0005)),
+        layers.Dropout(0.10),
         layers.Dense(3, activation="softmax"),
     ])
 
     model.compile(
-        optimizer=optimizers.Adam(learning_rate=1e-3),
+        optimizer=optimizers.Adam(learning_rate=5e-4),
         loss="sparse_categorical_crossentropy",
-        metrics=[
-            "accuracy",
-            AUC(name="auc"),
-        ],
+        metrics=["accuracy"],
     )
 
     return model

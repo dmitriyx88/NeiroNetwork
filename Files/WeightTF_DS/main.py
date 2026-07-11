@@ -90,13 +90,17 @@ def main() -> None:
         plot_probability_distribution(probabilities)
     
     elif TASK == "multiclass":
-        # Для многоклассовой классификации predict возвращает вероятности для каждого класса.
-        probabilities = model.predict(X_test, verbose=0)
-        predictions = np.argmax(probabilities, axis=1)
+        # Для 3-классовой классификации predict возвращает вероятности [Sell, NoTrade, Buy].
+        probabilities = model.predict(X_test, verbose=0)   # shape (N, 3)
+        class_indices = np.argmax(probabilities, axis=1)   # 0=Sell, 1=NoTrade, 2=Buy
+        signals = class_indices - 1                        # обратно в -1 / 0 / +1
 
         print()
-        print("Первые 10 прогнозов Target1 (многоклассовая):")
-        print(predictions[:10])
+        print("Первые 10 вероятностей [Sell, NoTrade, Buy]:")
+        print(probabilities[:10].round(3))
+
+        print("Первые 10 торговых сигналов (-1=Sell, 0=NoTrade, +1=Buy):")
+        print(signals[:10])
 
     else:
         # Для регрессии predict возвращает ожидаемое Target2.
