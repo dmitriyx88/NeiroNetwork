@@ -126,7 +126,7 @@ def main() -> None:
         # Для 3-классовой классификации predict возвращает вероятности [Sell, NoTrade, Buy].
         probabilities = model.predict(X_test, verbose=0)   # shape (N, 3)
         class_indices = np.argmax(probabilities, axis=1)   # 0=Sell, 1=NoTrade, 2=Buy
-        signals = class_indices - 1                        # обратно в -1 / 0 / +1
+        signals = class_indices                       # обратно в -1 / 0 / +1
 
         print()
         print("Balanced accuracy:")
@@ -137,15 +137,22 @@ def main() -> None:
         print(classification_report(
             y_test,
             class_indices,
-            target_names=["Sell (-1)", "NoTrade (0)", "Buy (+1)"],
+            labels=list(range(6)),
+            target_names=["Buy TP",
+    "Sell TP",
+    "Buy SL",
+    "Sell SL",
+    "Timeout",
+    "No Trade",],
             digits=4,
+            zero_division=0,
         ))
 
         print()
         print("Первые 10 вероятностей [Sell, NoTrade, Buy]:")
         print(probabilities[:10].round(3))
 
-        print("Первые 10 торговых сигналов (-1=Sell, 0=NoTrade, +1=Buy):")
+        print("Первые 10 предсказанных классов (0=BuyTP, 1=SellTP, 2=BuySL, 3=SellSL, 4=Timeout, 5=NoTrade):")
         print(signals[:10])
 
         # Графики для 3-классовой классификации.

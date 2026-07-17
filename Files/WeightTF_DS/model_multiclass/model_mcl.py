@@ -38,14 +38,14 @@ def build_multiclassification_model(input_size: int, X_train: np.ndarray) -> mod
     model = models.Sequential([
         layers.Input(shape=(input_size,)),
         normalizer,
-        layers.Dense(24, activation="relu", kernel_regularizer=regularizers.l2(0.0005)),
+        layers.Dense(64, activation="relu", kernel_regularizer=regularizers.l2(0.0005)),
         #layers.Dropout(0.25),
 
-        layers.Dense(16, activation="relu", kernel_regularizer=regularizers.l2(0.0005)),
+        layers.Dense(32, activation="relu", kernel_regularizer=regularizers.l2(0.0005)),
         #layers.Dropout(0.20),
-        layers.Dense(8, activation="relu", kernel_regularizer=regularizers.l2(0.0005)),
+        layers.Dense(16, activation="relu", kernel_regularizer=regularizers.l2(0.0005)),
         #layers.Dropout(0.10),
-        layers.Dense(3, activation="softmax"),
+        layers.Dense(6, activation="softmax"),
     ])
 
     model.compile(

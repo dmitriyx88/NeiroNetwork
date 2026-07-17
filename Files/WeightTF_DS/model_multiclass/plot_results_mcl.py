@@ -3,12 +3,17 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 from graphic_hist import finish_plot
 
-CLASS_NAMES = ["Sell (-1)", "NoTrade (0)", "Buy (+1)"]
+CLASS_NAMES = ["Buy TP",
+    "Sell TP",
+    "Buy SL",
+    "Sell SL",
+    "Timeout",
+    "No Trade",]
 
 
 def plot_confusion_matrix_mcl(y_true, y_pred_classes) -> None:
     """Матрица ошибок 3×3. Принимает классы 0/1/2."""
-    cm = confusion_matrix(y_true, y_pred_classes)
+    cm = confusion_matrix(y_true, y_pred_classes, labels=list(range(len(CLASS_NAMES))))
     disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=CLASS_NAMES)
     disp.plot(cmap="Blues")
     plt.title("Матрица ошибок (мультикласс)")
@@ -17,10 +22,10 @@ def plot_confusion_matrix_mcl(y_true, y_pred_classes) -> None:
 
 def plot_class_distribution(y_true, y_pred_classes) -> None:
     """Столбчатый график: реальное vs предсказанное распределение классов."""
-    x = np.arange(3)
+    x = np.arange(len(CLASS_NAMES))
     width = 0.35
-    true_counts = [np.sum(y_true == i) for i in range(3)]
-    pred_counts  = [np.sum(y_pred_classes == i) for i in range(3)]
+    true_counts = [np.sum(y_true == i) for i in range(len(CLASS_NAMES))]
+    pred_counts  = [np.sum(y_pred_classes == i) for i in range(len(CLASS_NAMES))]
     plt.bar(x - width / 2, true_counts, width, label="Реальные",      color="steelblue")
     plt.bar(x + width / 2, pred_counts, width, label="Предсказанные", color="orange")
     plt.xticks(x, CLASS_NAMES)

@@ -4,7 +4,10 @@ import pandas as pd
 def get_target_mcl(df: pd.DataFrame):
     # Target1: многоклассовая цель.
     # -1 → 0 (Sell),  0 → 1 (NoTrade),  1 → 2 (Buy)
-    return prepare_multiclass_target(df["Target1"].values)
+    
+    #return prepare_multiclass_target(df["Target1"].values)
+    
+    return df["Target1"].astype("int32").values
 
 
 def prepare_multiclass_target(y: np.ndarray) -> np.ndarray:
